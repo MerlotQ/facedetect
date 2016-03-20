@@ -37,6 +37,13 @@
 % This should work on 32 and 64 bit versions of Windows, MacOS, and Linux
 close all
 clear
+clc
+
+scale_step = 0.2;
+cell_step = 2; 
+confident_thresh = 0.7;
+num_negative_examples = 20000;
+
 run('vlfeat-0.9.20/toolbox/vl_setup')
 
 [~,~,~] = mkdir('visualizations');
@@ -60,7 +67,7 @@ feature_params = struct('template_size', 36, 'hog_cell_size', 6);
 
 features_pos = get_positive_features( train_path_pos, feature_params );
 
-num_negative_examples = 10000; %Higher will work strictly better, but you should start with 10000 for debugging
+%num_negative_examples = 10000; %Higher will work strictly better, but you should start with 10000 for debugging
 features_neg = get_random_negative_features( non_face_scn_path, feature_params, num_negative_examples);
 
     
@@ -77,7 +84,7 @@ features_neg = get_random_negative_features( non_face_scn_path, feature_params, 
 %b = rand(1); %placeholder, delete
 lambda = 0.0001; %%former 0.0001
 feature  = [features_pos; features_neg];
-label  = [ones(size(features_pos,1),1); -1*ones(size(features_neg,1),1)];
+label  = [ones(size(features_pos,1),1); -1 * ones(size(features_neg,1),1)];
 [w, b] = vl_svmtrain(feature', label, lambda);
 
 %% step 3. Examine learned classifier
@@ -86,7 +93,7 @@ label  = [ones(size(features_pos,1),1); -1*ones(size(features_neg,1),1)];
 % but it is a good sanity check. Your training error should be very low.
 
 fprintf('Initial classifier performance on train data:\n')
-confidences = [features_pos; features_neg]*w + b;
+confidences = [features_pos; features_neg] * w + b;
 label_vector = [ones(size(features_pos,1),1); -1*ones(size(features_neg,1),1)];
 [tp_rate, fp_rate, tn_rate, fn_rate] =  report_accuracy( confidences, label_vector );
 
@@ -128,7 +135,7 @@ imwrite(hog_template_image, 'visualizations/hog_template.png')
 % YOU CODE 'run_detector'. Make sure the outputs are properly structured!
 % They will be interpreted in Step 6 to evaluate and visualize your
 % results. See run_detector.m for more details.
-[bboxes, confidences, image_ids] = run_detector(test_scn_path, w, b, feature_params);
+[bboxes, confidences, image_ids] = run_detector(test_scn_path, w, b, feature_params, scale_step, cell_step, confident_thresh);
 
 % run_detector will have (at least) two parameters which can heavily
 % influence performance -- how much to rescale each step of your multiscale

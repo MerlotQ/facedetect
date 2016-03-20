@@ -27,14 +27,19 @@ function features_pos = get_positive_features(train_path_pos, feature_params)
 %  http://www.vlfeat.org/matlab/vl_hog.html  (API)
 %  http://www.vlfeat.org/overview/hog.html   (Tutorial)
 % rgb2gray
-train_path_pos
+
 image_files = dir( fullfile( train_path_pos, '*.jpg') ); %Caltech Faces stored as .jpg
 num_images = length(image_files);
 
 % placeholder to be deleted
-features_pos = rand(100, (feature_params.template_size / feature_params.hog_cell_size)^2 * 31);
 
-for i=1:1:num_images
-    [train_path_pos,'/',image_files(i).name];
-    IM=single(imread([train_path_pos,'/',image_files(i).name]));
-end
+features_pos=zeros(2 * num_images,(feature_params.template_size / feature_params.hog_cell_size)^2 * 31);
+
+ perm = vl_hog('permutation') ;
+ for i=1:1:num_images
+     img=single(imread([train_path_pos,'/',image_files(i).name]));%% to be same with run_detector
+     HOG1 = vl_hog(img, feature_params.hog_cell_size);
+     features_pos(2*i-1,:)=reshape(HOG1,1,[]);
+     HOG2 = HOG1(:,end:-1:1,perm);
+     features_pos(2*i,:)=reshape(HOG2,1,[]);
+ end

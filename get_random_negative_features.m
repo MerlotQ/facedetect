@@ -34,6 +34,22 @@ function features_neg = get_random_negative_features(non_face_scn_path, feature_
 
 image_files = dir( fullfile( non_face_scn_path, '*.jpg' ));
 num_images = length(image_files);
+num_per_img = ceil(num_samples / num_images); 
+features_neg = zeros(num_per_img * num_images,(feature_params.template_size / feature_params.hog_cell_size)^2 * 31);
 
-% placeholder to be deleted
-features_neg = rand(100, (feature_params.template_size / feature_params.hog_cell_size)^2 * 31);
+ for i=1:1:num_images
+     img = single( rgb2gray(imread([non_face_scn_path,'/',image_files(i).name]) ));%% to be same with run_detector
+     [img_x,img_y] = size(img);
+     for j=1:1:num_per_img
+        rand_x = ceil((img_x -feature_params.template_size) * rand()); 
+        rand_y = ceil((img_y -feature_params.template_size) * rand());
+        rand_img = img(rand_x:rand_x + feature_params.template_size - 1, rand_y:rand_y + feature_params.template_size - 1);
+        HOG = vl_hog(rand_img, feature_params.hog_cell_size);
+        features_neg((i - 1) * num_per_img + j,:)=reshape(HOG,1,[]);
+     end
+ end
+
+
+
+
+
