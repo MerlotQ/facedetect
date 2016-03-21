@@ -104,7 +104,7 @@ if draw
     % getframe() is unreliable. Depending on the rendering settings, it will
     % grab foreground windows instead of the figure in question. It could also
     % return a partial image.
-    imwrite(average_precision_image, 'visualizations/average_precision.png')
+    imwrite(average_precision_image, '../visualizations/average_precision.png')
     
     figure(13)
     plot(cum_fp,rec,'-')

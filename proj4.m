@@ -45,7 +45,7 @@ num_negative_examples = 40000;
 
 run('vlfeat-0.9.20/toolbox/vl_setup')
 
-[~,~,~] = mkdir('visualizations');
+[~,~,~] = mkdir('../visualizations');
 
 data_path = '../data/'; %change if you want to work with a network copy
 train_path_pos = fullfile(data_path, 'caltech_faces/Caltech_CropFaces'); %Positive training examples. 36x36 head crops
@@ -119,7 +119,7 @@ hog_template_image = frame2im(getframe(3));
 % getframe() is unreliable. Depending on the rendering settings, it will
 % grab foreground windows instead of the figure in question. It could also
 % return a partial image.
-imwrite(hog_template_image, 'visualizations/hog_template.png')
+imwrite(hog_template_image, '../visualizations/hog_template.png')
     
  
 %% step 4. (optional) Mine hard negatives

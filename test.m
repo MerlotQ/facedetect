@@ -15,7 +15,7 @@ confident_thresh = 0.75;
 
 run('vlfeat-0.9.20/toolbox/vl_setup')
 
-[~,~,~] = mkdir('visualizations');
+[~,~,~] = mkdir('../visualizations');
 
 data_path = '../data/'; %change if you want to work with a network copy
 train_path_pos = fullfile(data_path, 'caltech_faces/Caltech_CropFaces'); %Positive training examples. 36x36 head crops
