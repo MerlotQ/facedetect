@@ -36,13 +36,12 @@
 % See http://www.vlfeat.org/matlab/matlab.html for VLFeat Matlab documentation
 % This should work on 32 and 64 bit versions of Windows, MacOS, and Linux
 close all
-clear
 clc
 
-scale_step = 0.2;
-cell_step = 2; 
-confident_thresh = 0.7;
-num_negative_examples = 20000;
+scale_step = 0.1;
+cell_step = 1; 
+confident_thresh = 0.75;
+num_negative_examples = 40000;
 
 run('vlfeat-0.9.20/toolbox/vl_setup')
 

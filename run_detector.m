@@ -59,26 +59,28 @@ for i = 1:length(test_scenes)
     cur_bboxes = zeros(0,4);
     cur_confidences = zeros(0,1);
     cur_image_ids = cell(0,1);
-    for s = 0.1:scale_step:1
+    for s = 0.05:scale_step:1.05
         
         scaled_img = imresize(img,s);
         hog_img = vl_hog(scaled_img,feature_params.hog_cell_size);
         hog_x = size(hog_img,2);
         hog_y = size(hog_img,1);
-        hog_traverse=[];
-        hog_x_index=[];
-        hog_y_index=[];
-        for x = 1:cell_step:(hog_x - t_c + 1)
-            for y = 1:cell_step:(hog_y - t_c + 1)
-                hog_traverse = [hog_traverse; reshape(hog_img(y:(y + t_c - 1),x:(x + t_c - 1),:),1,[]) ];
-                hog_x_index = [hog_x_index;x];
-                hog_y_index = [hog_y_index;y];
-            end
-        end
-        if isempty(hog_traverse)
+        if (hog_x < t_c || hog_y < t_c)
             continue;
         end
-        
+        hog_traverse = [];
+        hog_x_index = [];
+        hog_y_index = [];
+        hog_traverse((hog_x - t_c + 1) * (hog_y - t_c + 1),t_c ^ 2 * 31) = 0;
+        hog_x_index((hog_x - t_c + 1) * (hog_y - t_c + 1),1) = 0;
+        hog_y_index((hog_x - t_c + 1) * (hog_y - t_c + 1),1) = 0;
+        for x = 1:1:(hog_x - t_c + 1)
+            for y = 1:1:(hog_y - t_c + 1)
+                hog_traverse((hog_y - t_c + 1) * (x-1) + y,:) =  reshape(hog_img(y:(y + t_c - 1),x:(x + t_c - 1),:),1,[]) ;
+                hog_x_index((hog_y - t_c + 1) * (x-1) + y,1) = x;
+                hog_y_index((hog_y - t_c + 1) * (x-1) + y,1) = y;
+            end
+        end
         hog_traverse_result = (hog_traverse * w) + b;
         good_index = find(hog_traverse_result > confident_thresh);
         if isempty(good_index)
@@ -89,17 +91,18 @@ for i = 1:length(test_scenes)
         good_hog = hog_traverse_result(good_index);
         good_x_index = hog_x_index(good_index);
         good_y_index = hog_y_index(good_index);
+        
+        
         img_x_min = (feature_params.hog_cell_size * (good_x_index -1)) ./s;
         img_y_min = (feature_params.hog_cell_size * (good_y_index -1)) ./s;
         img_x_max = (feature_params.hog_cell_size * (good_x_index -1 + t_c -1)) ./s;
         img_y_max = (feature_params.hog_cell_size * (good_y_index -1 + t_c -1)) ./s;
         img_ids = repmat({test_scenes(i).name}, size(good_index,1), 1);
         
-
-
-        cur_bboxes = [cur_bboxes;[img_x_min,img_y_min,img_x_max,img_y_max]];
-        cur_confidences = [cur_confidences;good_hog];
-        cur_image_ids= [cur_image_ids;img_ids];
+        add_num = size(img_x_min,1);
+        cur_bboxes(end+1:end+add_num,:) = [img_x_min,img_y_min,img_x_max,img_y_max];
+        cur_confidences(end+1:end+add_num,:) = good_hog;
+        cur_image_ids(end+1:end+add_num,:) = img_ids;
     end
     
     %You can delete all of this below.
@@ -119,15 +122,16 @@ for i = 1:length(test_scenes)
     
     
     [is_maximum] = non_max_supr_bbox(cur_bboxes, cur_confidences, size(img));
-        
+    
     
     cur_confidences = cur_confidences(is_maximum,:);
     cur_bboxes      = cur_bboxes(     is_maximum,:);
     cur_image_ids   = cur_image_ids(  is_maximum,:);
     
-    bboxes      = [bboxes;      cur_bboxes];
-    confidences = [confidences; cur_confidences];
-    image_ids   = [image_ids;   cur_image_ids];
+    add_num = size(cur_confidences,1);
+    bboxes(end+1:end+add_num,:)      = cur_bboxes;
+    confidences(end+1:end+add_num,:) = cur_confidences;
+    image_ids(end+1:end+add_num,:)   = cur_image_ids;
 end
 
 

@@ -34,20 +34,22 @@ function features_neg = get_random_negative_features(non_face_scn_path, feature_
 
 image_files = dir( fullfile( non_face_scn_path, '*.jpg' ));
 num_images = length(image_files);
-num_per_img = ceil(num_samples / num_images); 
-features_neg = zeros(num_per_img * num_images,(feature_params.template_size / feature_params.hog_cell_size)^2 * 31);
+num_per_img = ceil(num_samples / num_images);
+features_neg = [];
+features_neg(num_per_img * num_images,(feature_params.template_size / feature_params.hog_cell_size)^2 * 31) = 0;
 
- for i=1:1:num_images
-     img = single( rgb2gray(imread([non_face_scn_path,'/',image_files(i).name]) ));%% to be same with run_detector
-     [img_x,img_y] = size(img);
-     for j=1:1:num_per_img
-        rand_x = ceil((img_x -feature_params.template_size) * rand()); 
-        rand_y = ceil((img_y -feature_params.template_size) * rand());
-        rand_img = img(rand_x:rand_x + feature_params.template_size - 1, rand_y:rand_y + feature_params.template_size - 1);
+for i=1:1:num_images
+    img = single( rgb2gray(imread([non_face_scn_path,'/',image_files(i).name]) ));%% to be same with run_detector
+    [img_x,img_y] = size(img);
+    
+    rand_x = ceil( rand(1,num_per_img) * (img_x -feature_params.template_size));  
+    rand_y = ceil( rand(1,num_per_img) * (img_y -feature_params.template_size));  
+    for j=1:1:num_per_img
+        rand_img = img(rand_x(j):rand_x(j) + feature_params.template_size - 1, rand_y(j):rand_y(j) + feature_params.template_size - 1);
         HOG = vl_hog(rand_img, feature_params.hog_cell_size);
         features_neg((i - 1) * num_per_img + j,:)=reshape(HOG,1,[]);
-     end
- end
+    end
+end
 
 
 

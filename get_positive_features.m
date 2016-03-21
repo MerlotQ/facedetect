@@ -32,8 +32,8 @@ image_files = dir( fullfile( train_path_pos, '*.jpg') ); %Caltech Faces stored a
 num_images = length(image_files);
 
 % placeholder to be deleted
-
-features_pos=zeros(2 * num_images,(feature_params.template_size / feature_params.hog_cell_size)^2 * 31);
+features_pos = [];
+features_pos(2 * num_images,(feature_params.template_size / feature_params.hog_cell_size)^2 * 31) = 0;
 
  perm = vl_hog('permutation') ;
  for i=1:1:num_images
