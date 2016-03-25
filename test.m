@@ -9,9 +9,9 @@ clc
 
 load('w_b.mat');
 
-scale_step = 0.09;
+scale_step = 0.1;
 cell_step = 1; 
-confident_thresh = 0.75;
+confident_thresh = 0.8;
 
 run('vlfeat-0.9.20/toolbox/vl_setup')
 
@@ -21,7 +21,7 @@ data_path = '../data/'; %change if you want to work with a network copy
 train_path_pos = fullfile(data_path, 'caltech_faces/Caltech_CropFaces'); %Positive training examples. 36x36 head crops
 non_face_scn_path = fullfile(data_path, 'train_non_face_scenes'); %We can mine random or hard negatives from here
 test_scn_path = fullfile(data_path,'test_scenes/test_jpg'); %CMU+MIT test scenes
-% test_scn_path = fullfile(data_path,'extra_test_scenes'); %Bonus scenes
+%test_scn_path = fullfile(data_path,'extra_test_scenes'); %Bonus scenes
 label_path = fullfile(data_path,'test_scenes/ground_truth_bboxes.txt'); %the ground truth face locations in the test set
 
 %The faces are 36x36 pixels, which works fine as a template size. You could
@@ -60,11 +60,11 @@ feature_params = struct('template_size', 36, 'hog_cell_size', 6);
 % for testing on extra images (it is commented out below).
 
 % Don't modify anything in 'evaluate_detections'!
-[gt_ids, gt_bboxes, gt_isclaimed, tp, fp, duplicate_detections] = ...
+%[gt_ids, gt_bboxes, gt_isclaimed, tp, fp, duplicate_detections] = ...
     evaluate_detections(bboxes, confidences, image_ids, label_path);
 
 visualize_detections_by_image(bboxes, confidences, image_ids, tp, fp, test_scn_path, label_path)
-% visualize_detections_by_image_no_gt(bboxes, confidences, image_ids, test_scn_path)
+%visualize_detections_by_image_no_gt(bboxes, confidences, image_ids, test_scn_path)
 
 % visualize_detections_by_confidence(bboxes, confidences, image_ids, test_scn_path, label_path);
 

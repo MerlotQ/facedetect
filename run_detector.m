@@ -51,15 +51,14 @@ for i = 1:length(test_scenes)
     
     fprintf('Detecting faces in %s\n', test_scenes(i).name)
     img = imread( fullfile( test_scn_path, test_scenes(i).name ));
-    img = single(img);
     if(size(img,3) > 1)
         img = rgb2gray(img);
     end
-    
-    cur_bboxes = zeros(0,4);
-    cur_confidences = zeros(0,1);
-    cur_image_ids = cell(0,1);
-    for s = 0.05:scale_step:1.05
+    img = single(img);
+     cur_bboxes = zeros(0,4);
+     cur_confidences = zeros(0,1);
+     cur_image_ids = cell(0,1);
+    for s = 0.04:scale_step:1.05
         
         scaled_img = imresize(img,s);
         hog_img = vl_hog(scaled_img,feature_params.hog_cell_size);
@@ -100,9 +99,17 @@ for i = 1:length(test_scenes)
         img_ids = repmat({test_scenes(i).name}, size(good_index,1), 1);
         
         add_num = size(img_x_min,1);
-        cur_bboxes(end+1:end+add_num,:) = [img_x_min,img_y_min,img_x_max,img_y_max];
-        cur_confidences(end+1:end+add_num,:) = good_hog;
-        cur_image_ids(end+1:end+add_num,:) = img_ids;
+        
+        if isempty(cur_bboxes)
+            cur_bboxes(1:add_num,:) = [img_x_min,img_y_min,img_x_max,img_y_max];
+            cur_confidences(1:add_num,:) = good_hog;
+            cur_image_ids(1:add_num,:) = img_ids;
+            
+        else
+            cur_bboxes(end+1:end+add_num,:) = [img_x_min,img_y_min,img_x_max,img_y_max];
+            cur_confidences(end+1:end+add_num,:) = good_hog;
+            cur_image_ids(end+1:end+add_num,:) = img_ids;
+        end
     end
     
     %You can delete all of this below.
